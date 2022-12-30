@@ -15,7 +15,6 @@ model binh_luan {
   ngay_binh_luan DateTime?  @db.Date
   nguoi_dung     nguoi_dung @relation(fields: [nguoi_dung_id], references: [nguoi_dung_id], onDelete: Cascade, onUpdate: Cascade, map: "binh_luan_ibfk_1")
   hinh_anh       hinh_anh   @relation(fields: [hinh_id], references: [hinh_id], onDelete: Cascade, onUpdate: Cascade, map: "binh_luan_ibfk_2")
-
   @@id([nguoi_dung_id, hinh_id])
   @@index([hinh_id], map: "hinh_id")
 }

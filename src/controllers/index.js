@@ -1,6 +1,8 @@
 const { successCode, failCode, errorCode } = require("../config/response");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient(); //tuong tu const model = initial-Model()
+const bcrypt = require("bcrypt");
+const { parseToken, checkToken } = require("../middlewares/baseToken");
 
 //--------------trang chủ---------------
 
@@ -37,8 +39,6 @@ const getHinhAnhByName = async (req, res) => {
 };
 
 //-------------trang đăng kí----------
-const bcrypt = require("bcrypt");
-const { parseToken, checkToken } = require("../middlewares/baseToken");
 const signUp = async (req, res) => {
   try {
     let { email, mat_khau, ho_ten, tuoi } = req.body;
@@ -85,7 +85,7 @@ const login = async (req, res) => {
   }
 };
 
-//----------trang chi tiết----------
+//--------------trang chi tiết----------
 const getHinhAnhById = async (req, res) => {
   try {
     let { hinh_id } = req.params;
@@ -139,19 +139,23 @@ const checkLuuHinhAnh = async (req, res) => {
   }
 };
 
-// const postBinhLuan = async (req, res) => {
-//   let { hinh_id, nguoi_dung_id } = req.params;
-//   let { noi_dung } = req.body;
-//   let data = await prisma.binh_luan.create({
-//     data: {
-//       nguoi_dung_id: Number(nguoi_dung_id),
-//       hinh_id: Number(hinh_id),
-//       noi_dung,
-//     }
-//   });
-//   console.log(data)
-// //   successCode(res,data, "Bình luận thành công");
-// };
+const postBinhLuan = async (req, res) => {
+  try {
+    let { hinh_id, nguoi_dung_id } = req.params;
+    let { noi_dung } = req.body;
+    let data = await prisma.binh_luan.create({
+      data: {
+        nguoi_dung_id: Number(nguoi_dung_id),
+        hinh_id: Number(hinh_id),
+        noi_dung,
+      },
+    });
+    console.log(data);
+    successCode(res, data, "Bình luận thành công");
+  } catch (err) {
+    errorCode(res, "Lỗi BackEnd");
+  }
+};
 
 const getUserById = async (req, res) => {
   try {
@@ -196,50 +200,74 @@ const getAnhDaTao = async (req, res) => {
 };
 
 const xoaHinhDaTao = async (req, res) => {
- try{
-  let { nguoi_dung_id, hinh_id } = req.params;
-  let data = await prisma.hinh_anh.deleteMany({
-    where: {
-      hinh_id: Number(hinh_id),
-      nguoi_dung_id: Number(nguoi_dung_id),
-    },
-  });
-  // console.log()
-  if(data.count != 0){
-  successCode(res, data, "Xóa ảnh đã tạo thành công");
-  }else{
-    failCode(res,data,"Xóa ảnh thất bại")
+  try {
+    let { nguoi_dung_id, hinh_id } = req.params;
+    let data = await prisma.hinh_anh.deleteMany({
+      where: {
+        hinh_id: Number(hinh_id),
+        nguoi_dung_id: Number(nguoi_dung_id),
+      },
+    });
+    // console.log()
+    if (data.count != 0) {
+      successCode(res, data, "Xóa ảnh đã tạo thành công");
+    } else {
+      failCode(res, data, "Xóa ảnh thất bại");
+    }
+  } catch (err) {
+    errorCode(res, "Lỗi BackEnd");
   }
- }catch(err){
-  errorCode(res,"Lỗi BackEnd")
- }
 };
 
 const themAnhTao = async (req, res) => {
-  try{
-   let { nguoi_dung_id, hinh_id } = req.params;
-   let {ten_hinh,duong_dan,mo_ta} = req.body
-   let data = await prisma.hinh_anh.create({
-    data:{
-      nguoi_dung_id:Number(nguoi_dung_id),
-      hinh_id:Number(hinh_id),
-      ten_hinh,
-      duong_dan,
-      mo_ta
-    }
-   });
-   successCode(res, data, "Thêm ảnh thành công");
-  }catch(err){
-   errorCode(res,"Lỗi BackEnd")
+  try {
+    let { nguoi_dung_id, hinh_id } = req.params;
+    let { ten_hinh, duong_dan, mo_ta } = req.body;
+    let data = await prisma.hinh_anh.create({
+      data: {
+        nguoi_dung_id: Number(nguoi_dung_id),
+        hinh_id: Number(hinh_id),
+        ten_hinh,
+        duong_dan,
+        mo_ta,
+      },
+    });
+    successCode(res, data, "Thêm ảnh thành công");
+  } catch (err) {
+    errorCode(res, "Lỗi BackEnd");
   }
- };
+};
 
-
- const thayDoiThongTin = async (req,res) =>{
- 
- }
-
-
+const thayDoiThongTin = async (req, res) => {
+  // try{
+  let { nguoi_dung_id } = req.params;
+  let { email, mat_khau, ho_ten, tuoi, anh_dai_dien } = req.body;
+  let checkUser = await prisma.nguoi_dung.findFirst({
+    where: {
+      nguoi_dung_id: Number(nguoi_dung_id),
+    },
+  });
+  if (checkUser) {
+    let data = await prisma.nguoi_dung.update({
+      data: {
+        email,
+        mat_khau,
+        ho_ten,
+        tuoi,
+        anh_dai_dien,
+      },
+      where: {
+        nguoi_dung_id: Number(nguoi_dung_id),
+      },
+    });
+    successCode(res, data, "Cập nhật thành công");
+  } else {
+    failCode(res, nguoi_dung_id, "Người dùng không tồn tại");
+  }
+  // }catch(err){
+  //   errorCode(res,"Lỗi Backend")
+  // }
+};
 
 module.exports = {
   getHinhAnh,
@@ -249,11 +277,11 @@ module.exports = {
   getHinhAnhById,
   getBinhLuanById,
   checkLuuHinhAnh,
-  //   postBinhLuan,
+  postBinhLuan,
   getUserById,
   getAnhDaLuu,
   getAnhDaTao,
   xoaHinhDaTao,
   themAnhTao,
-  thayDoiThongTin
+  thayDoiThongTin,
 };
