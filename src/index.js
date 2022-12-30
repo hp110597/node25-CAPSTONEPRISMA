@@ -18,6 +18,8 @@ const {
   getAnhDaLuu,
   getAnhDaTao,
   xoaHinhDaTao,
+  themAnhTao,
+  thayDoiThongTin,
 } = require("./controllers");
 const { verifyToken } = require("./middlewares/baseToken");
 
@@ -48,3 +50,10 @@ app.get("/personal/getAnhDaLuu/:nguoi_dung_id", getAnhDaLuu);
 app.get("/personal/getAnhDaTao/:nguoi_dung_id", getAnhDaTao);
 
 app.delete("/personal/xoaAnhDaTao/:nguoi_dung_id/:hinh_id",xoaHinhDaTao)
+
+
+//--------trang thêm ảnh---------
+app.post("/personal/themAnhTao/:nguoi_dung_id/:hinh_id",themAnhTao)
+
+//--------trang thay đổi thông tin cá nhân---------------
+app.put("/thayDoiThongTin/:nguoi_dung_id",thayDoiThongTin)

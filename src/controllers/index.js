@@ -196,32 +196,51 @@ const getAnhDaTao = async (req, res) => {
 };
 
 const xoaHinhDaTao = async (req, res) => {
-  // try {
+ try{
   let { nguoi_dung_id, hinh_id } = req.params;
-  let data = await prisma.hinh_anh.delete({
-    // include:{
-    //   nguoi_dung:true
-    // },
-
+  let data = await prisma.hinh_anh.deleteMany({
     where: {
       hinh_id: Number(hinh_id),
       nguoi_dung_id: Number(nguoi_dung_id),
     },
   });
-  //   console.log(data)
-  //   if(!data.content){
-  //   let dataDelete = data.filter(data=>data.hinh_id!=Number(hinh_id))
+  // console.log()
+  if(data.count != 0){
   successCode(res, data, "Xóa ảnh đã tạo thành công");
-  // //  console.log(dataDelete)
-
-  //   }else{
-  //     failCode(res,"","Xóa ảnh thất bại")
-  //   }
-
-  // } catch (err) {
-  //   errorCode(res, "Lỗi Backend");
-  // }
+  }else{
+    failCode(res,data,"Xóa ảnh thất bại")
+  }
+ }catch(err){
+  errorCode(res,"Lỗi BackEnd")
+ }
 };
+
+const themAnhTao = async (req, res) => {
+  try{
+   let { nguoi_dung_id, hinh_id } = req.params;
+   let {ten_hinh,duong_dan,mo_ta} = req.body
+   let data = await prisma.hinh_anh.create({
+    data:{
+      nguoi_dung_id:Number(nguoi_dung_id),
+      hinh_id:Number(hinh_id),
+      ten_hinh,
+      duong_dan,
+      mo_ta
+    }
+   });
+   successCode(res, data, "Thêm ảnh thành công");
+  }catch(err){
+   errorCode(res,"Lỗi BackEnd")
+  }
+ };
+
+
+ const thayDoiThongTin = async (req,res) =>{
+ 
+ }
+
+
+
 module.exports = {
   getHinhAnh,
   getHinhAnhByName,
@@ -235,4 +254,6 @@ module.exports = {
   getAnhDaLuu,
   getAnhDaTao,
   xoaHinhDaTao,
+  themAnhTao,
+  thayDoiThongTin
 };
