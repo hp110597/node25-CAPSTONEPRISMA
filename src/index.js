@@ -43,7 +43,7 @@ app.get("/detail/checkLuuHinhAnh/:hinh_id/:nguoi_dung_id",verifyToken, checkLuuH
 app.post("/detail/postBinhLuan/:hinh_id/:nguoi_dung_id",verifyToken,postBinhLuan)
 
 //--------trang quản lí ảnh----------
-app.get("/personal/getNguoiDung/:nguoi_dung_id",verifyToken, getUserById);
+app.get("/personal/getNguoiDung/",verifyToken, getUserById);
 
 app.get("/personal/getAnhDaLuu/:nguoi_dung_id",verifyToken, getAnhDaLuu);
 

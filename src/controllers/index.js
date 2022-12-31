@@ -2,7 +2,7 @@ const { successCode, failCode, errorCode } = require("../config/response");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient(); //tuong tu const model = initial-Model()
 const bcrypt = require("bcrypt");
-const { parseToken, checkToken } = require("../middlewares/baseToken");
+const { parseToken, checkToken, convertToken } = require("../middlewares/baseToken");
 
 //--------------trang chủ---------------
 
@@ -159,7 +159,10 @@ const postBinhLuan = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    let { nguoi_dung_id } = req.params;
+    let {token} = req.headers
+    let payload = convertToken (token)
+    console.log(payload.payload.data.nguoi_dung_id)
+    let { nguoi_dung_id } = payload.payload.data;
     let data = await prisma.nguoi_dung.findFirst({
       where: {
         nguoi_dung_id: Number(nguoi_dung_id),

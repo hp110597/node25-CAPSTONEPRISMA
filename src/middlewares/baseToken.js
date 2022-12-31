@@ -5,7 +5,10 @@ const parseToken = (data) => {
     return token;
 }
 
-
+const convertToken = (token)=>{
+    let decodedData = jwt.decode(token,{complete:true})
+    return decodedData
+}
 const checkToken = (token) => {
     try {
         let checkT = jwt.verify(token, "bimat");
@@ -37,5 +40,6 @@ const verifyToken = (req, res, next) => {
 module.exports = {
     parseToken,
     checkToken,
-    verifyToken
+    verifyToken,
+    convertToken
 }
